@@ -236,7 +236,13 @@
       $target.parents(".list-card").trigger('click');
       ignoreEvent = false;
     } else {
-      window.location.href = "/b/" + board;
+      $.get(trelloAPI + "boards/" + board + "?fields=url")
+        .done(function (resp) {
+          window.location.href = resp.url;
+        })
+        .fail(function (xhr, status, err) {
+          alert("Can't find target board. The link might be broken or you might not have access to it.");
+        });
     }
 
     e.preventDefault();
