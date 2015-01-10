@@ -122,7 +122,7 @@
   }
 
   function addLinkButton(buttonContainer) {
-    var linkBtn = $('<a href="#" class="button-link js-link-board-card" title="Link this card to another board."> <span class="icon-sm icon-card"></span> Link </a>');
+    var linkBtn = $('<a href="#" class="button-link js-link-board-card" title="Link this card to another board."> <span class="icon-sm icon-card"></span> Link board </a>');
     buttonContainer.append(linkBtn);
 
     linkBtn.on("click", function () {
