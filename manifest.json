@@ -4,7 +4,7 @@
     "name": "Trellonest",
     "short_name": "Trellonest",
     "description": "Trellonests enables nested boards in Trello. Just link your existing cards to boards or create totally new boards from them!",
-    "version": "0.1.0",
+    "version": "0.2.0",
 
     "content_scripts": [
         {
