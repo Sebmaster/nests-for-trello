@@ -55,21 +55,36 @@
     return card || null;
   }
 
+  var establishingSocket = false;
   var currentSocket;
   function establishSocket() {
+    if (establishingSocket) return;
+    establishingSocket = true;
+
     var token = getLoginToken();
 
     getBoard(function (err, boardId) {
+      if (err) {
+        establishingSocket = false;
+        return;
+      }
+
       if (currentSocket) {
+        establishingSocket = false;
+
         currentSocket.close();
         currentSocket = null;
+        return; // reestablishing called by close
       }
 
       var reqId = 0;
       var socket = new WebSocket("wss://trello.com/1/Session/socket?token=" + token);
       currentSocket = socket;
+      establishingSocket = false;
+
       socket.onopen = function () {
         socket.send(JSON.stringify({ type: "ping", reqid: reqId++ }));
+        socket.send(JSON.stringify({ type: "setSessionStatus", status: "idle", reqid: reqId++ }));
         socket.send(JSON.stringify({ type: "subscribe", modelType: "Board", idModel: boardId, tags: ["clientActions", "updates"], invitationTokens: [], reqid: reqId++ }));
       };
 
@@ -92,6 +107,26 @@
             boardCards[keys[i]].desc = deltas[boardCards[keys[i]].id];
           }
         }
+      };
+
+      var intervalPing = setInterval(function () {
+        socket.send("");
+      }, 20000); // ping every 20 seconds
+      
+      var intervalActivity = setInterval(function () {
+        socket.send(JSON.stringify({ type: "setSessionStatus", status: "idle", idBoard: boardId, reqid: reqId++ }));
+      }, (5 * 60)* 1000); // ping every 5 minutes
+      
+      socket.onclose = function () {
+        clearInterval(intervalPing);
+        clearInterval(intervalActivity);
+        establishSocket();
+      };
+
+      socket.onerror = function () {
+        clearInterval(intervalPing);
+        clearInterval(intervalActivity);
+        establishSocket();
       };
     });
   }
