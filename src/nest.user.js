@@ -251,9 +251,10 @@
 
     if (board && !penIcon.next().is(".icon-card")) {
       var cardIcon = penIcon.clone()
-															.removeClass("icon-edit")
-															.addClass("icon-card")
-															.css("top", "25px");
+        .removeClass("icon-edit")
+        .addClass("icon-card")
+        .css("top", "25px");
+
       penIcon.after(cardIcon);
     } else if (!board && penIcon.next().is(".icon-card")) {
       penIcon.next().remove();
