@@ -100,7 +100,7 @@
     var oldDesc = boardCards[cardId].desc;
     var newDesc = oldDesc ? oldDesc.replace(/\[\/\/\]:\s*#board\s*\((.*?)\)/, "[//]:#board(" + targetBoard + ")") : "[//]:#board(" + targetBoard + ")";
 
-    if (oldDesc === newDesc) {
+    if (oldDesc === newDesc && newDesc.indexOf("[//]:#board(" + targetBoard + ")") === -1) {
       newDesc += "\r\n\r\n[//]:#board(" + targetBoard + ")";
     }
 
