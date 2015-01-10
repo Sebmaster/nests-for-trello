@@ -19,13 +19,13 @@
       var board = boardMatch && boardMatch[1];
       if (board) {
         $.get(trelloAPI + "boards/" + board + "?fields=id")
-					.done(function (resp) {
-					  boardCache = resp.id;
-					  cb(null, resp.id);
-					})
-					.fail(function (xhr, status, err) {
-					  cb(err);
-					});
+          .done(function (resp) {
+            boardCache = resp.id;
+            cb(null, resp.id);
+          })
+          .fail(function (xhr, status, err) {
+            cb(err);
+          });
       } else {
         cb(null, null);
       }
@@ -35,13 +35,13 @@
         var card = cardMatch && cardMatch[1];
 
         $.get(trelloAPI + "cards/" + card + "?fields=idBoard")
-					.done(function (resp) {
-					  boardCache = resp.idBoard;
-					  cb(null, resp.idBoard);
-					})
-					.fail(function (xhr, status, err) {
-					  cb(err);
-					});
+          .done(function (resp) {
+            boardCache = resp.idBoard;
+            cb(null, resp.idBoard);
+          })
+          .fail(function (xhr, status, err) {
+            cb(err);
+          });
       } else {
         cb(new Error("Unsupported trello page"));
       }
@@ -115,11 +115,10 @@
     }).done(function () {
       if (!cb) return;
       cb(null);
-    })
-		.fail(function (xhr, _, err) {
-		  if (!cb) return;
-		  cb(err);
-		});
+    }).fail(function (xhr, _, err) {
+      if (!cb) return;
+      cb(err);
+    });
   }
 
   function addLinkButton(buttonContainer) {
