@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "Trellonest",
-    "short_name": "Trellonest",
-    "description": "Trellonests enables nested boards in Trello. Just link your existing cards to boards or create totally new boards from them!",
+    "name": "Nests for Trello",
+    "short_name": "Nests",
+    "description": "Nests for Trello enables nested boards in Trello. Just link your existing cards to boards or create totally new boards from them!",
     "version": "0.2.0",
 
     "content_scripts": [
