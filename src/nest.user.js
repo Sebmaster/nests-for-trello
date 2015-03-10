@@ -179,7 +179,11 @@
         return;
       }
 
-      linkCardToBoard(card, target);
+      linkCardToBoard(card, target, function (err) {
+        if (err) {
+          alert('Linking the board failed! The error was: ' + (err.message || err));
+        }
+      });
     });
   }
 
