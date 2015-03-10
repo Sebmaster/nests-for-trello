@@ -13,6 +13,12 @@
     return (token && unescape(token[1])) || null;
   }
 
+  var boardUrlRegex = /((^(https?:\/\/)?trello.com)?\/?b\/)?([^\/]+)\/?/;
+  function parseBoardUrl(url) {
+    var match = boardUrlRegex.exec(url);
+    return match[4] || null;
+  }
+
   function getBoard(cb) {
     var boardMatch = window.location.pathname.match(/^\/b\/(.*?)(\/|$)/);
     if (boardMatch) {
@@ -166,6 +172,12 @@
 
       var target = prompt("Please provide the target board id");
       if (target === null) return;
+
+      target = parseBoardUrl(target);
+      if (target === null) {
+        alert('Failed to parse provided board url!');
+        return;
+      }
 
       linkCardToBoard(card, target);
     });
