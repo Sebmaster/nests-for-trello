@@ -19,6 +19,12 @@
     return match[4] || null;
   }
 
+  var cardUrlRegex = /((^(https?:\/\/)?trello.com)?\/?c\/)?([^\/]+)\/?/;
+  function parseCardUrl(url) {
+    var match = cardUrlRegex.exec(url);
+    return match[4] || null;
+  }
+
   function getBoard(cb) {
     var boardMatch = window.location.pathname.match(/^\/b\/(.*?)(\/|$)/);
     if (boardMatch) {
@@ -137,12 +143,12 @@
     });
   }
 
-  function linkCardToBoard(cardId, targetBoard, cb) {
+  function linkCardToTarget(cardId, type, targetBoard, cb) {
     var oldDesc = boardCards[cardId].desc;
-    var newDesc = oldDesc ? oldDesc.replace(/\[\/\/\]:\s*#board\s*\((.*?)\)/, "[//]:#board(" + targetBoard + ")") : "[//]:#board(" + targetBoard + ")";
+    var newDesc = oldDesc ? oldDesc.replace(/\[\/\/\]:\s*#(?:board|card)\s*\((.*?)\)/, "[//]:#" + type + "(" + targetBoard + ")") : "[//]:#" + type + "(" + targetBoard + ")";
 
-    if (oldDesc === newDesc && newDesc.indexOf("[//]:#board(" + targetBoard + ")") === -1) {
-      newDesc += "\r\n\r\n[//]:#board(" + targetBoard + ")";
+    if (oldDesc === newDesc && newDesc.indexOf("[//]:#" + type + "(" + targetBoard + ")") === -1) {
+      newDesc += "\r\n\r\n[//]:#" + type + "(" + targetBoard + ")";
     }
 
     $.ajax({
@@ -179,7 +185,7 @@
         return;
       }
 
-      linkCardToBoard(card, target, function (err) {
+      linkCardToTarget(card, "board", target, function (err) {
         if (err) {
           alert('Linking the board failed! The error was: ' + (err.message || err));
         }
@@ -198,11 +204,36 @@
       var card = boardCards[cardId];
       $.post(trelloAPI + "boards?fields=url", { name: card.name, desc: card.desc, token: getLoginToken() }, function (e) {
         var card = getActiveCard();
-        linkCardToBoard(card, e.url.match(/\/b\/(.*?)(\/|$)/)[1], function (err) {
+        linkCardToTarget(card, "board", e.url.match(/\/b\/(.*?)(\/|$)/)[1], function (err) {
           if (err) alert("Failed to link card to the new board, please retry linking it later!");
 
           window.open(e.url);
         });
+      });
+    });
+  }
+
+  function addLinkCardButton(buttonContainer) {
+    var linkBtn = $('<a href="#" class="button-link js-link-card-card" title="Link this card to a card on another board."> <span class="icon-sm icon-card"></span> Link card </a>');
+    buttonContainer.append(linkBtn);
+
+    linkBtn.on("click", function () {
+      var card = getActiveCard();
+      if (!card) return alert("Could not parse card id");
+
+      var target = prompt("Please provide the target card id");
+      if (target === null) return;
+
+      target = parseCardUrl(target);
+      if (target === null) {
+        alert('Failed to parse provided card url!');
+        return;
+      }
+
+      linkCardToTarget(card, "card", target, function (err) {
+        if (err) {
+          alert('Linking the card failed! The error was: ' + (err.message || err));
+        }
       });
     });
   }
@@ -216,6 +247,9 @@
     }
     if ($(".js-create-board-card", objects).length === 0) {
       addCreateButton(objects);
+    }
+    if ($(".js-link-card-card", objects).length === 0) {
+      addLinkCardButton(objects);
     }
   }
 
@@ -260,8 +294,13 @@
       return null;
     }
 
-    var match = cardData.desc && cardData.desc.match(/\[\/\/\]:\s*#board\s*\((.*?)\)/);
-    return (match && match[1]) || null;
+    var match = cardData.desc && cardData.desc.match(/\[\/\/\]:\s*#(board|card)\s*\((.*?)\)/);
+    if (!match) return null;
+    
+    return {
+      type: match[1],
+      id: match[2]
+    };
   }
 
   refreshCards();
@@ -278,21 +317,21 @@
 
     addButtons();
 
-    var board = getBoardFromCard(card);
-    if (!board) return;
-
     if ($target.is('.icon-edit') || $target.parents(".icon-edit").length) {
 
       ignoreEvent = true;
       $target.parents(".list-card").trigger('click');
       ignoreEvent = false;
     } else {
-      $.get(trelloAPI + "boards/" + board + "?fields=url")
+      var target = getBoardFromCard(card);
+      if (!target) return;
+      
+      $.get(trelloAPI + target.type + "s/" + target.id + "?fields=url")
         .done(function (resp) {
           window.location.href = resp.url;
         })
         .fail(function (xhr, status, err) {
-          alert("Can't find target board. The link might be broken or you might not have access to it.");
+          alert("Can't find target. The link might be broken or you might not have access to it.");
         });
     }
 
