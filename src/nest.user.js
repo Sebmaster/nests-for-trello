@@ -209,7 +209,7 @@
 
   function addButtons() {
     var objects = $(".card-detail-window .window-module.other-actions div:last-child");
-    if (!objects.length) return setTimeout(addButtons, 1000);
+    if (!objects.length) return setTimeout(addButtons, 50);
 
     if ($(".js-link-board-card", objects).length === 0) {
       addLinkButton(objects);
