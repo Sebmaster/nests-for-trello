@@ -317,27 +317,28 @@
 
     addButtons();
 
-    if ($target.is('.icon-edit') || $target.parents(".icon-edit").length) {
-
-      ignoreEvent = true;
-      $target.parents(".list-card").trigger('click');
-      ignoreEvent = false;
-    } else {
+    if (!$target.is('.icon-edit') && !$target.parents(".icon-edit").length) {
       var target = getBoardFromCard(card);
       if (!target) return;
+        return;
+      } 
       
       $.get(trelloAPI + target.type + "s/" + target.id + "?fields=url")
         .done(function (resp) {
           window.location.href = resp.url;
         })
         .fail(function (xhr, status, err) {
-          alert("Can't find target. The link might be broken or you might not have access to it.");
+          alert("Can't find target board. The board link might be broken or you might not have access to it.");
+          ignoreEvent = true;
+          $target.parents(".list-card").trigger('click');
+          ignoreEvent = false;
         });
-    }
 
-    e.preventDefault();
-    e.stopImmediatePropagation();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
   }, true); // have to set useCapture because trello stops bubbling
+
 
   $(document).on("mouseenter", "#board .list-card", function () {
     var card = this;
