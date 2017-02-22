@@ -319,10 +319,9 @@
 
     if (!$target.is('.icon-edit') && !$target.parents(".icon-edit").length) {
       var target = getBoardFromCard(card);
-      if (!target) return;
+      if (!target)
         return;
-      } 
-      
+
       $.get(trelloAPI + target.type + "s/" + target.id + "?fields=url")
         .done(function (resp) {
           window.location.href = resp.url;
