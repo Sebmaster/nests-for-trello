@@ -317,7 +317,7 @@
 
     addButtons();
 
-    if (!$target.is('.icon-edit') && !$target.parents(".icon-edit").length) {
+    if ($target.is('.icon-card') || $target.parents(".icon-card").length) {
       var target = getBoardFromCard(card);
       if (!target)
         return;
