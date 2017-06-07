@@ -176,7 +176,7 @@
       var card = getActiveCard();
       if (!card) return alert("Could not parse card id");
 
-      var target = prompt("Please provide the target board id");
+      var target = prompt("Please provide the target board id (e.g. if the board is at https://trello.com/b/xtszzq/hello-board, the id is xtszzq)");
       if (target === null) return;
 
       target = parseBoardUrl(target);
